@@ -8,22 +8,36 @@
 
 # Build results
 
+# Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
+!packages/*/build/
+
+=======
 [Dd]ebug/
+[Dd]ebugPublic/
 [Rr]elease/
 x64/
 build/
+bld/
 [Bb]in/
 [Oo]bj/
-
-# Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
-!packages/*/build/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
+#NUNIT
+*.VisualState.xml
+TestResult.xml
+
+# Build Results of an ATL Project
+[Dd]ebugPS/
+[Rr]eleasePS/
+dlldata.c
+
 *_i.c
 *_p.c
+*_i.h
+
 *.ilk
 *.meta
 *.obj
@@ -38,14 +52,19 @@ build/
 *.tlh
 *.tmp
 *.tmp_proj
-*.log
 *.vspscc
 *.vssscc
 .builds
 *.pidb
 *.log
+
+*.svclog
 *.scc
 
+# Chutzpah Test files
+_Chutzpah*
+
+>>>>>>> 5f829c32826fa6f3d9b46eb5da6b494a66fd892d
 # Visual C++ cache files
 ipch/
 *.aps
@@ -59,12 +78,25 @@ ipch/
 *.vsp
 *.vspx
 
+<<<<<<< HEAD
+=======
+# TFS 2012 Local Workspace
+$tf/
+
+>>>>>>> 5f829c32826fa6f3d9b46eb5da6b494a66fd892d
 # Guidance Automation Toolkit
 *.gpState
 
 # ReSharper is a .NET coding add-in
 _ReSharper*/
 *.[Rr]e[Ss]harper
+<<<<<<< HEAD
+=======
+*.DotSettings.user
+
+# JustCode is a .NET coding addin-in
+.JustCode
+>>>>>>> 5f829c32826fa6f3d9b46eb5da6b494a66fd892d
 
 # TeamCity is a build add-in
 _TeamCity*
@@ -75,6 +107,16 @@ _TeamCity*
 # NCrunch
 *.ncrunch*
 .*crunch*.local.xml
+
+_NCrunch_*
+.*crunch*.local.xml
+
+# MightyMoose
+*.mm.*
+AutoTest.Net/
+
+# Web workbench (sass)
+.sass-cache/
 
 # Installshield output folder
 [Ee]xpress/
@@ -101,6 +143,20 @@ publish/
 
 # Windows Azure Build Output
 csx
+*.[Pp]ublish.xml
+*.azurePubxml
+
+# NuGet Packages Directory
+packages/
+## TODO: If the tool you use requires repositories.config uncomment the next line
+#!packages/repositories.config
+
+# Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
+# This line needs to be after the ignore of the build folder (and the packages folder if the line above has been uncommented)
+!packages/build/
+
+# Windows Azure Build Output
+csx/
 *.build.csdef
 
 # Windows Store app package directory
@@ -117,6 +173,10 @@ ClientBin/
 *.[Pp]ublish.xml
 *.pfx
 *.publishsettings
+*.dbproj.schemaview
+*.pfx
+*.publishsettings
+node_modules/
 
 # RIA/Silverlight projects
 Generated_Code/
@@ -154,3 +214,13 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+*.mdf
+*.ldf
+
+# Business Intelligence projects
+*.rdl.data
+*.bim.layout
+*.bim_*.settings
+
+# Microsoft Fakes
+FakesAssemblies/
