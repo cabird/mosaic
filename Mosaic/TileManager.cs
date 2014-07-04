@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Mosaic
 {
-    class TileManager
+    public class TileManager
     {
         List<TileDirectory> TileDirectories;
 
@@ -44,7 +44,7 @@ namespace Mosaic
             return new Size(width, height);
         }
 
-        public Tile FindBestTile(MosaicTile mosaicTile)
+        public Tile FindBestTile(MosaicTileLocation mosaicTile)
         {
             Int64 bestDistance = 0;
             Tile bestTile = null;

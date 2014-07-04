@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Mosaic
 {
-    class CellGrid
+    public class CellGrid
     {
         public readonly int Rows = 7;
         public readonly int Columns = 7;

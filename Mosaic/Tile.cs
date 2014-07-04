@@ -14,7 +14,7 @@ using System.Diagnostics;
 namespace Mosaic
 {
     [Serializable]
-    class Tile
+    public class Tile
     {
 
         protected Tile()

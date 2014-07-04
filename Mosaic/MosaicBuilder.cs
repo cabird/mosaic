@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Mosaic
 {
-    class MosaicBuilder
+    public class MosaicBuilder
     {
         TileManager tileManager;
         MosaicImage mosaicImage;
@@ -17,16 +17,14 @@ namespace Mosaic
         {
             this.tileManager = tileManager;
             this.mosaicImage = mosaicImage;
-            Bitmap bmp = new Bitmap(mosaicImage.Width, mosaicImage.Height);
-            mosaicImage.Analyze();
 
             /* build and shuffle the list of tile locations that need to be filled in */
-            List<MosaicTile> mosaicTiles = new List<MosaicTile>();
+            List<MosaicTileLocation> mosaicTileLocations = new List<MosaicTileLocation>();
             foreach (var tile in mosaicImage.TileGrid)
             {
-                mosaicTiles.Add(tile);
+                mosaicTileLocations.Add(tile);
             }
-            mosaicTiles.Shuffle();
+            mosaicTileLocations.Shuffle();
 
             var start = DateTime.Now;
 
@@ -35,23 +33,25 @@ namespace Mosaic
 
             int completedTiles = 0;
             /* for each tile location, find the best image time that goes in that image */
-            foreach (var mosaicTile in mosaicTiles)
+            foreach (var mosaicTileLocation in mosaicTileLocations)
             {
-                SetUnavailableImageTiles(mosaicTile);
-                Tile tile = tileManager.FindBestTile(mosaicTile);
-                mosaicTile.ImageTile = tile;
+                SetUnavailableImageTiles(mosaicTileLocation);
+                Tile tile = tileManager.FindBestTile(mosaicTileLocation);
+                mosaicTileLocation.ImageTile = tile;
+
+                mosaicImage.DrawTileOntoBitmap(mosaicTileLocation);
 
                 completedTiles++;
                 seconds = (int)(DateTime.Now - start).TotalSeconds;
                 if (seconds > lastSeconds)
                 {
-                    Debug.WriteLine("Completed {0} tiles {1:0.0}% in {2} seconds", completedTiles, completedTiles * 100 / mosaicTiles.Count, seconds);
+                    Debug.WriteLine("Completed {0} tiles {1:0.0}% in {2} seconds", completedTiles, completedTiles * 100 / mosaicTileLocations.Count, seconds);
                     lastSeconds = seconds;
                 }
             }
         }
 
-        public void SetUnavailableImageTiles(MosaicTile mosaicTile)
+        public void SetUnavailableImageTiles(MosaicTileLocation mosaicTile)
         {
             tileManager.SetAllTilesAvailable();
 

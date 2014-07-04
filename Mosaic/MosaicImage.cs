@@ -8,36 +8,41 @@ using System.Threading.Tasks;
 
 namespace Mosaic
 {
-    class MosaicImage
+    public class MosaicImage
     {
 
         string path;
         Bitmap rawBitmap;
-        public Size OriginalBitmapSize { get { return rawBitmap.Size; } }
-        
         Bitmap scaledBitmap;
+        Bitmap mosaicBitmap;
 
-        public readonly int TilesWide = 20;
-        public readonly int TilesHigh = 20;
+        public float ColorAdjustment { get; set; }
+        public Bitmap RawBitmap { get { return rawBitmap; } }
+        public Bitmap ScaledBitmap { get { return scaledBitmap; } }
+        public Bitmap MosaicBitmap { get { return mosaicBitmap; } }
+
+        public Bitmap Bitmap { get { return mosaicBitmap ?? scaledBitmap ?? rawBitmap; } }
+        public Size OriginalBitmapSize { get { return rawBitmap.Size; } }
+
+        public delegate void BitmapUpdated();
+
+        public BitmapUpdated bitmapUpdatedDelegate;
+        
+
+
+        public int TilesWide = 20;
+        public int TilesHigh = 20;
         int TileWidth;
         int TileHeight;
-
-
 
         public int Width { get { return TilesWide * TileWidth; } }
         public int Height { get { return TilesHigh * TileHeight; } }
 
-        public MosaicTile[,] TileGrid;
+        public MosaicTileLocation[,] TileGrid;
 
-        public MosaicImage(string path, int tilesWide, Size tileSize)
+        public MosaicImage(string path)
         {
             Load(path);
-            TilesWide = tilesWide;
-
-            int tileWidthPixels = rawBitmap.Width / tilesWide;
-            int tileHeightPixels = tileWidthPixels * tileSize.Height / tileSize.Width;
-
-            TilesHigh = rawBitmap.Height / tileHeightPixels;
         }
 
         private void Load(string path)
@@ -46,14 +51,23 @@ namespace Mosaic
             rawBitmap = new Bitmap(path);
         }
 
-        public void Analyze()
+        public void Analyze(int tilesWide, Size tileSize)
         {
+            TilesWide = tilesWide;
+
+            int tileWidthPixels = rawBitmap.Width / tilesWide;
+            int tileHeightPixels = tileWidthPixels * tileSize.Height / tileSize.Width;
+
+            TilesHigh = rawBitmap.Height / tileHeightPixels;
+
             TileWidth = rawBitmap.Width  / TilesWide;
             TileHeight = rawBitmap.Height / TilesHigh;
 
-            TileGrid = new MosaicTile[TilesWide, TilesHigh];
+            TileGrid = new MosaicTileLocation[TilesWide, TilesHigh];
 
             scaledBitmap = new Bitmap(rawBitmap, Width, Height);
+
+            bitmapUpdatedDelegate();
 
             /* create a copy that we'll lock */
             Bitmap bitmap = new Bitmap(scaledBitmap);
@@ -74,13 +88,11 @@ namespace Mosaic
             {
                 for (int tileX=0; tileX < TilesWide; tileX++)
                 {
-                    MosaicTile tile = new MosaicTile() {Width = TileWidth, Height = TileHeight, TileX = tileX, TileY = tileY};
+                    MosaicTileLocation tile = new MosaicTileLocation() {Width = TileWidth, Height = TileHeight, TileX = tileX, TileY = tileY};
                     tile.ComputeCellColors(bitmapData, data);
                     TileGrid[tileX, tileY] = tile;
                 }
             }
-            scaledBitmap.Dispose();
-            scaledBitmap = null;
         }
 
         public Bitmap GenerateCellGridBitmap()
@@ -133,6 +145,30 @@ namespace Mosaic
                 }
             }
             return bmp;
+        }
+
+        public void PrepareToDrawMosaic()
+        {
+            mosaicBitmap = new Bitmap(scaledBitmap, TilesWide * TileWidth, TilesHigh * TileHeight);
+            bitmapUpdatedDelegate();
+        }
+
+        public void DrawTileOntoBitmap(MosaicTileLocation tileLocation)
+        {
+            ColorMatrix matrix = new ColorMatrix();
+            matrix.Matrix33 = 1 - ColorAdjustment; //opacity 0 = completely transparent, 1 = completely opaque
+
+            ImageAttributes attributes = new ImageAttributes();
+            attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+            Graphics g = Graphics.FromImage(mosaicBitmap);
+            Rectangle drawRect = new Rectangle(tileLocation.TileX * TileWidth, tileLocation.TileY * TileHeight, TileWidth, TileHeight);
+
+            Bitmap tileBitmap = tileLocation.ImageTile.LoadTile();
+            g.DrawImage(tileBitmap, drawRect, 0, 0, tileBitmap.Width, tileBitmap.Height, GraphicsUnit.Pixel, attributes);
+            tileLocation.ImageTile.ReleaseImage();
+
+            bitmapUpdatedDelegate();
         }
     }
 }

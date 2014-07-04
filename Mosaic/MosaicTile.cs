@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Mosaic
 {
-    class MosaicTile
+    public class MosaicTileLocation
     {
         public CellGrid cellGrid;
         public int TileX;
@@ -17,7 +17,7 @@ namespace Mosaic
         public int Height;
         public Tile ImageTile;
 
-        public MosaicTile()
+        public MosaicTileLocation()
         {
 
         }
